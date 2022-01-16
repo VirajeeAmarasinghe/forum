@@ -1,0 +1,36 @@
+version: '3'
+services:
+  web:
+    image: osiolabs/drupaldevwithdocker-php:7.4
+    volumes:
+      - ./drupal:/var/www:cached
+    environment:
+      APACHE_DOCROOT_DIR: /var/www/web
+    ports:
+      - "80:80"
+    depends_on: 
+      - db
+  db:
+    image: osiolabs/drupaldevwithdocker-mysql
+    container_name: mysql_forum_db
+    volumes:
+      - ./db-backups:/var/mysql/backups:delegated
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: drupal_forum
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: verybadpassword
+    ports:
+      - "3306:3306"
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    ports:
+     - "8001:80"
+    depends_on: 
+      - db
